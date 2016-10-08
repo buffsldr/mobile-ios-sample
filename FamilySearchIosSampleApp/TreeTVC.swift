@@ -31,8 +31,8 @@ class TreeTVC: UITableViewController {
         cache.totalCostLimit = 30*1024*1024
         
         // get the access token from NSUserDefaults
-        let preferences = NSUserDefaults.standardUserDefaults()
-        accessToken = preferences.stringForKey(Utilities.KEY_ACCESS_TOKEN)
+        let preferences = UserDefaults.standard
+        accessToken = preferences.string(forKey: Utilities.KEY_ACCESS_TOKEN)
         
         // get url for family tree from Collections
         Utilities.getUrlsFromCollections({ [weak self] (collectionsResponse, error) -> Void in
@@ -52,7 +52,7 @@ class TreeTVC: UITableViewController {
                                     {
                                         // set the received array, update table
                                         self?.personArray = (responsePersons! as NSArray as? [Person])!
-                                        dispatch_async(dispatch_get_main_queue(),{
+                                        DispatchQueue.main.async(execute: {
                                             
                                             // remove loading spinner view from tvc
                                             Utilities.removeWaitingView((self?.view)!)
@@ -68,17 +68,17 @@ class TreeTVC: UITableViewController {
         })
     }
     
-    func getAncestryQueryUrlAsString(familyTreeUrlAsString : String, completionQuery:(responseTemplate:String?, errorQuery:NSError?) -> ())
+    func getAncestryQueryUrlAsString(_ familyTreeUrlAsString : String, completionQuery:@escaping (_ responseTemplate:String?, _ errorQuery:NSError?) -> ())
     {
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration();
-        let headers: [NSObject : AnyObject] = ["Accept":"application/json"];
-        configuration.HTTPAdditionalHeaders = headers;
-        let session = NSURLSession(configuration: configuration)
+        let configuration = URLSessionConfiguration.default;
+        let headers: [AnyHashable: Any] = ["Accept":"application/json"];
+        configuration.httpAdditionalHeaders = headers;
+        let session = URLSession(configuration: configuration)
         
-        let familyTreeTask = session.dataTaskWithURL(NSURL(string:familyTreeUrlAsString)! ) { (familyTreeData, response, familyTreeError) in
+        let familyTreeTask = session.dataTask(with: URL(string:familyTreeUrlAsString)!, completionHandler: { (familyTreeData, response, familyTreeError) in
             do
             {
-                let familyTreeJson = try NSJSONSerialization.JSONObjectWithData(familyTreeData!, options: .AllowFragments);
+                let familyTreeJson = try JSONSerialization.jsonObject(with: familyTreeData!, options: .allowFragments);
                 //print("familyTreeJson = \(familyTreeJson)")
                 
                 // from here, we only care about the value of collections.links.ancestry-query.template, where collections is a json array
@@ -90,7 +90,7 @@ class TreeTVC: UITableViewController {
                     let entireTemplate = ancestryQuery!["template"] as! String
                     
                     // need to split the template URL, and get the left side of the { symbol
-                    let templateSplit = entireTemplate.componentsSeparatedByString("{")
+                    let templateSplit = entireTemplate.components(separatedBy: "{")
                     let template = templateSplit[0]
                     completionQuery(responseTemplate:template, errorQuery:nil)
                 }
@@ -99,33 +99,33 @@ class TreeTVC: UITableViewController {
             catch
             {
                 print("Error parsing the ancestry-query")
-                completionQuery(responseTemplate:nil, errorQuery:familyTreeError)
+                completionQuery(nil, familyTreeError as NSError?)
             }
-        }
+        } ) 
         familyTreeTask.resume()
     }
     
     // getAncestryTree
-    func getAncestryTree(ancestryRootUrlString:String,
+    func getAncestryTree(_ ancestryRootUrlString:String,
                          userPersonId:String, accessToken:String,
-                         completionTree:(responsePersons:NSMutableArray?, errorTree:NSError?) ->())
+                         completionTree:@escaping (_ responsePersons:NSMutableArray?, _ errorTree:NSError?) ->())
     {
         var ancestryUrlString = ancestryRootUrlString + "?" + "person=" + userPersonId
         ancestryUrlString = ancestryUrlString + "&" + "generations=" + "4"
         
-        let ancestryUrl = NSURL(string: ancestryUrlString);
+        let ancestryUrl = URL(string: ancestryUrlString);
         
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration();
-        let headers: [NSObject : AnyObject] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
-        configuration.HTTPAdditionalHeaders = headers;
-        let session = NSURLSession(configuration: configuration)
+        let configuration = URLSessionConfiguration.default;
+        let headers: [AnyHashable: Any] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
+        configuration.httpAdditionalHeaders = headers;
+        let session = URLSession(configuration: configuration)
         
-        let ancestryTreeTask = session.dataTaskWithURL(ancestryUrl!) { (ancestryData, ancestryResponse, ancestryError) in
+        let ancestryTreeTask = session.dataTask(with: ancestryUrl!, completionHandler: { (ancestryData, ancestryResponse, ancestryError) in
             if (ancestryError == nil)
             {
                 do
                 {
-                    let ancestryDataJson = try NSJSONSerialization.JSONObjectWithData(ancestryData!, options: .AllowFragments);
+                    let ancestryDataJson = try JSONSerialization.jsonObject(with: ancestryData!, options: .allowFragments);
                     //print("ancestryDataJson = \(ancestryDataJson)")
                     
                     let persons = ancestryDataJson["persons"] as? [[String : AnyObject]]
@@ -149,39 +149,39 @@ class TreeTVC: UITableViewController {
                         person.displayName = displayName
                         person.lifespan = lifespan
                         person.personLinkHref = personLinkHref
-                        arrayOfPersons.addObject(person)
+                        arrayOfPersons.add(person)
                     }
                     
-                    completionTree(responsePersons: arrayOfPersons, errorTree: nil)
+                    completionTree(arrayOfPersons, nil)
                 }
                 catch
                 {
                     print("Error getting ancestry tree data. Error = \(ancestryError)")
-                    completionTree(responsePersons: nil, errorTree: ancestryError)
+                    completionTree(nil, ancestryError as NSError?)
                 }
             }
             else
             {
-                completionTree(responsePersons: nil, errorTree: ancestryError)
+                completionTree(nil, ancestryError as NSError?)
             }
-        }
+        }) 
         
         ancestryTreeTask.resume()
     }
     
     // MARK: - Table View Controller methods
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1;
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.personArray.count
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell : PersonCell = self.tableView.dequeueReusableCellWithIdentifier("PersonCell")! as! PersonCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell : PersonCell = self.tableView.dequeueReusableCell(withIdentifier: "PersonCell")! as! PersonCell
         
-        let person = personArray.objectAtIndex(indexPath.row) as! Person
+        let person = personArray.object(at: (indexPath as NSIndexPath).row) as! Person
         cell.ancestorName.text = person.displayName
         cell.ancestorLifespan.text = person.lifespan
         
@@ -192,7 +192,7 @@ class TreeTVC: UITableViewController {
         {
             // the code below is to create an image cache
             var ancestorImage = UIImage()
-            if let cachedImage = cache.objectForKey(imageLink) as? UIImage
+            if let cachedImage = cache.object(forKey: imageLink) as? UIImage
             {
                 // image exists in cache, so use the cached image
                 ancestorImage = cachedImage
@@ -202,7 +202,7 @@ class TreeTVC: UITableViewController {
             {
                 // no image found in cache, so need to create cached image from download service
                 Utilities.getImageFromUrl(imageLink, accessToken: accessToken!) { (data, response, error)  in
-                    dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                    DispatchQueue.main.async { () -> Void in
                         ancestorImage = UIImage(data: data!)!
                         self.cache.setObject(ancestorImage, forKey: imageLink)
                         cell.ancestorPicture.image = ancestorImage
@@ -219,16 +219,16 @@ class TreeTVC: UITableViewController {
         return cell
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let person = personArray.objectAtIndex(indexPath.row) as! Person
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let person = personArray.object(at: (indexPath as NSIndexPath).row) as! Person
         
-        self.performSegueWithIdentifier("segueToAncestorDetails", sender: person)
+        self.performSegue(withIdentifier: "segueToAncestorDetails", sender: person)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "segueToAncestorDetails")
         {            
-            let detailsVC = (segue.destinationViewController as? AncestorDetails)!
+            let detailsVC = (segue.destination as? AncestorDetails)!
             detailsVC.person = sender as? Person
         }
     }

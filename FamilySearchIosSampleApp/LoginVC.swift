@@ -23,7 +23,7 @@ class LoginVC: UIViewController {
         
         usernameTextField.placeholder = NSLocalizedString("usernamePlaceholderText", comment: "username, in email form")
         passwordTextField.placeholder = NSLocalizedString("passwordPlaceholderText", comment: "password")
-        loginButtonOutlet.setTitle(NSLocalizedString("loginText", comment: "text for login button"), forState: UIControlState.Normal)
+        loginButtonOutlet.setTitle(NSLocalizedString("loginText", comment: "text for login button"), for: UIControlState())
         dataUsageLabel.text = NSLocalizedString("loginDataUsage", comment: "description of data usage")
     }
 
@@ -32,14 +32,14 @@ class LoginVC: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func loginAction(sender: AnyObject)
+    @IBAction func loginAction(_ sender: AnyObject)
     {
         lockScreen()
 
         guard let
             username = usernameTextField.text,
-            password = passwordTextField.text
-            where !username.isEmpty && !password.isEmpty
+            let password = passwordTextField.text
+            , !username.isEmpty && !password.isEmpty
             else {
                 self.showAlert("Error", description: "User name or password missing")
                 unlockScreen()
@@ -95,7 +95,7 @@ class LoginVC: UIViewController {
         })
     }
     
-    func getToken(tokenUrlAsString : String, username : String, password : String, client_id : String, completionToken:(responseToken:String?, errorToken:NSError?) -> ()) {
+    func getToken(_ tokenUrlAsString : String, username : String, password : String, client_id : String, completionToken:@escaping (_ responseToken:String?, _ errorToken:NSError?) -> ()) {
         let grant_type = "password";
         
         let params = "?username=" + username +
@@ -106,10 +106,10 @@ class LoginVC: UIViewController {
         let urlAsString = tokenUrlAsString + params
         
         // create the post request
-        let request = NSMutableURLRequest(URL: NSURL(string: urlAsString)!)
+        let request = NSMutableURLRequest(URL: URL(string: urlAsString)!)
         request.HTTPMethod = "POST"
         
-        let task = NSURLSession.sharedSession().dataTaskWithRequest(request){ data, response, error in
+        let task = URLSession.sharedSession().dataTaskWithRequest(request){ data, response, error in
             guard error == nil else {
                 print("Error downloading token. Error: \(error)")
                 completionToken(responseToken: nil, errorToken: error)
@@ -149,20 +149,20 @@ class LoginVC: UIViewController {
     }
     
     // get the user data
-    func getCurrentUserData(currentUserUrlString : String, accessToken : String, completionCurrentUser:(responseUser:User?, errorUser:NSError?) -> ())
+    func getCurrentUserData(_ currentUserUrlString : String, accessToken : String, completionCurrentUser:@escaping (_ responseUser:User?, _ errorUser:NSError?) -> ())
     {
-        let currentUserUrl = NSURL(string: currentUserUrlString);
+        let currentUserUrl = URL(string: currentUserUrlString);
         
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration();
-        let headers: [NSObject : AnyObject] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
-        configuration.HTTPAdditionalHeaders = headers;
-        let session = NSURLSession(configuration: configuration)
+        let configuration = URLSessionConfiguration.default;
+        let headers: [AnyHashable: Any] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
+        configuration.httpAdditionalHeaders = headers;
+        let session = URLSession(configuration: configuration)
         
-        let currentUserTask = session.dataTaskWithURL(currentUserUrl!) { (data, currentUserResponse, errorUserData) in
+        let currentUserTask = session.dataTask(with: currentUserUrl!, completionHandler: { (data, currentUserResponse, errorUserData) in
             // parse the currentUser data
             do
             {
-                let currentUserJson = try NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments);
+                let currentUserJson = try JSONSerialization.jsonObject(with: data!, options: .allowFragments);
                 
                 if let usersJsonObject = currentUserJson["users"] as? [[String : AnyObject]]
                 {
@@ -192,7 +192,7 @@ class LoginVC: UIViewController {
                         let artifacts = links!["artifacts"] as? NSDictionary
                         user.artifactsHref = artifacts!["href"] as? String
                         
-                        completionCurrentUser(responseUser:user, errorUser:nil)
+                        completionCurrentUser(user, nil)
                         
                         return
                     }
@@ -201,25 +201,25 @@ class LoginVC: UIViewController {
                         print("The user JSON does not contain any data")
                     }
                     
-                    completionCurrentUser(responseUser:nil, errorUser:nil)
+                    completionCurrentUser(nil, nil)
                 }
 
             }
             catch
             {
-                completionCurrentUser(responseUser:nil, errorUser:errorUserData)
+                completionCurrentUser(nil, errorUserData as NSError?)
             }
-        }
+        }) 
         currentUserTask.resume()
         
     }
     
 // MARK: - Segue methods
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
     {
         if (segue.identifier == "segueToTabBar")
         {
-            let tabBarController : UITabBarController = (segue.destinationViewController as? UITabBarController)!
+            let tabBarController : UITabBarController = (segue.destination as? UITabBarController)!
             tabBarController.tabBar.items![0].title = NSLocalizedString("tabAncestorsName", comment: "name for list tab")
             tabBarController.tabBar.items![1].title = NSLocalizedString("tabMemoriesName", comment: "name for memories tab")
             
@@ -239,15 +239,15 @@ class LoginVC: UIViewController {
     }
 	
 // MARK: - Private methods
-	private func lockScreen() {
-		usernameTextField.enabled = false
-		passwordTextField.enabled = false
+	fileprivate func lockScreen() {
+		usernameTextField.isEnabled = false
+		passwordTextField.isEnabled = false
 		activityIndicator.startAnimating()
 	}
 	
-	private func unlockScreen() {
-		usernameTextField.enabled = true
-		passwordTextField.enabled = true
+	fileprivate func unlockScreen() {
+		usernameTextField.isEnabled = true
+		passwordTextField.isEnabled = true
 		activityIndicator.stopAnimating()
 	}
 }

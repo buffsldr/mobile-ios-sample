@@ -23,8 +23,8 @@ class MemoriesVC : UICollectionViewController
         Utilities.displayWaitingView(self.view)
         
         // get the access token from NSUserDefaults
-        let preferences = NSUserDefaults.standardUserDefaults()
-        accessToken = preferences.stringForKey(Utilities.KEY_ACCESS_TOKEN)
+        let preferences = UserDefaults.standard
+        accessToken = preferences.string(forKey: Utilities.KEY_ACCESS_TOKEN)
         
         // get an array of the links of images
         getMemoriesLinksForUser(accessToken!,
@@ -32,8 +32,7 @@ class MemoriesVC : UICollectionViewController
                                     if (errorLinks == nil)
                                     {
                                         // update collection view to display images
-                                        dispatch_async(dispatch_get_main_queue(),
-                                            {
+                                        DispatchQueue.main.async(execute: {
                                                 // remove waiting activity indicator
                                                 Utilities.removeWaitingView(self.view)
                                                 
@@ -44,22 +43,22 @@ class MemoriesVC : UICollectionViewController
         })
     }
     
-    func getMemoriesLinksForUser(accessToken:String,
-                                  completionLinks:(responseLinks:NSMutableArray?, errorLinks:NSError?) -> ())
+    func getMemoriesLinksForUser(_ accessToken:String,
+                                  completionLinks:@escaping (_ responseLinks:NSMutableArray?, _ errorLinks:NSError?) -> ())
     {
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration();
-        let headers: [NSObject : AnyObject] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
-        configuration.HTTPAdditionalHeaders = headers;
-        let session = NSURLSession(configuration: configuration)
+        let configuration = URLSessionConfiguration.default;
+        let headers: [AnyHashable: Any] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
+        configuration.httpAdditionalHeaders = headers;
+        let session = URLSession(configuration: configuration)
         
-        guard let memoriesHref = NSURL(string: user!.artifactsHref!) else {
+        guard let memoriesHref = URL(string: user!.artifactsHref!) else {
             return
         }
         
-        let memoriesTask = session.dataTaskWithURL(memoriesHref) { [weak self] (memoriesData, response, memoriesError) in
+        let memoriesTask = session.dataTask(with: memoriesHref, completionHandler: { [weak self] (memoriesData, response, memoriesError) in
             do
             {
-                let memoriesDataJson = try NSJSONSerialization.JSONObjectWithData(memoriesData!, options: .AllowFragments);
+                let memoriesDataJson = try JSONSerialization.jsonObject(with: memoriesData!, options: .allowFragments);
                 
                 let sourceDescriptions = memoriesDataJson["sourceDescriptions"] as? [NSDictionary]
                 for sourceDescription in sourceDescriptions!
@@ -71,43 +70,43 @@ class MemoriesVC : UICollectionViewController
                         let links = sourceDescription["links"] as? NSDictionary
                         let linkImageThumbnail = links?["image-thumbnail"] as? NSDictionary
                         let linkImageThumbnailHref = linkImageThumbnail!["href"] as? String
-                        self?.arrayOfImageThumbnailHrefs.addObject(linkImageThumbnailHref!)
+                        self?.arrayOfImageThumbnailHrefs.add(linkImageThumbnailHref!)
                     }
                     else
                     {
                         continue
                     }
                 }
-                completionLinks(responseLinks: self?.arrayOfImageThumbnailHrefs, errorLinks: nil)
+                completionLinks(self?.arrayOfImageThumbnailHrefs, nil)
             }
             catch
             {
-                completionLinks(responseLinks: nil, errorLinks: memoriesError)
+                completionLinks(nil, memoriesError as NSError?)
             }
-        }
+        }) 
         memoriesTask.resume()
     }
     
     // MARK: - UI Collection View Controller methods
-    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrayOfImageThumbnailHrefs.count
     }
     
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemoryCell", forIndexPath: indexPath) as! MemoryCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MemoryCell", for: indexPath) as! MemoryCell
         
-        let linkHref = arrayOfImageThumbnailHrefs.objectAtIndex(indexPath.row) as? String
+        let linkHref = arrayOfImageThumbnailHrefs.object(at: (indexPath as NSIndexPath).row) as? String
         
         // make sure the link and token variables are not nil
-        if let link = linkHref, token = accessToken
+        if let link = linkHref, let token = accessToken
         {
             Utilities.getImageFromUrl(link, accessToken: token) { (data, response, error)  in
-                dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                DispatchQueue.main.async { () -> Void in
                     guard let imageData = data else {
                         // no image data
                         return
@@ -166,3 +165,4 @@ class MemoriesVC : UICollectionViewController
 
 
 
+API_KEY

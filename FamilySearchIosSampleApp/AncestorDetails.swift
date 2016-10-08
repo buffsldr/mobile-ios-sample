@@ -26,17 +26,17 @@ class AncestorDetails : UIViewController
         self.navigationItem.title = NSLocalizedString("ancestorDetailsTitle", comment: "Word Ancestor")
         
         // hide data labels until the data gets downloaded
-        self.ancestorBirthLabelTitle.hidden = true
-        self.ancestorBirthLabelValue.hidden = true
-        self.ancestorDeathLabelTitle.hidden = true
-        self.ancestorDeathLabelValue.hidden = true
+        self.ancestorBirthLabelTitle.isHidden = true
+        self.ancestorBirthLabelValue.isHidden = true
+        self.ancestorDeathLabelTitle.isHidden = true
+        self.ancestorDeathLabelValue.isHidden = true
         
         // get the access token from NSUserDefaults
-        let preferences = NSUserDefaults.standardUserDefaults()
-        let accessToken = preferences.stringForKey(Utilities.KEY_ACCESS_TOKEN)
+        let preferences = UserDefaults.standard
+        let accessToken = preferences.string(forKey: Utilities.KEY_ACCESS_TOKEN)
         
         Utilities.getImageFromUrl(person!.personLinkHref!, accessToken: accessToken!) { (data, response, error)  in
-            dispatch_async(dispatch_get_main_queue()) { [weak self] () -> Void in
+            DispatchQueue.main.async { [weak self] () -> Void in
                 self?.ancestorImageView.image = UIImage(data: data!)
                 self?.ancestorImageIndicator.hidesWhenStopped = true
                 self?.ancestorImageIndicator.stopAnimating()
@@ -52,49 +52,49 @@ class AncestorDetails : UIViewController
                                completionAncestorDetails: { [weak self] (personDetails, errorResponse) -> Void in
                                     if (errorResponse == nil)
                                     {
-                                        dispatch_async(dispatch_get_main_queue(),{
+                                        DispatchQueue.main.async(execute: {
                                             self?.ancestorImageIndicator.hidesWhenStopped = true
                                             self?.ancestorDataIndicator.stopAnimating()
-                                            self?.ancestorDataIndicator.hidden = true
+                                            self?.ancestorDataIndicator.isHidden = true
                                             
                                             // birth data
                                             self?.ancestorBirthLabelTitle.text = NSLocalizedString("ancestorDetailsBirth", comment: "Birth:")
-                                            self?.ancestorBirthLabelTitle.hidden = false
+                                            self?.ancestorBirthLabelTitle.isHidden = false
                                             self?.ancestorBirthLabelValue.text = personDetails?.personBirthDate
-                                            self?.ancestorBirthLabelValue.hidden = false
+                                            self?.ancestorBirthLabelValue.isHidden = false
                                             
                                             // death data
                                             if (personDetails?.personDeathDate != nil)
                                             {
                                                 self?.ancestorDeathLabelTitle.text = NSLocalizedString("ancestorDetailsDeath", comment: "Death:")
-                                                self?.ancestorDeathLabelTitle.hidden = false
+                                                self?.ancestorDeathLabelTitle.isHidden = false
                                                 self?.ancestorDeathLabelValue.text = personDetails?.personDeathDate
-                                                self?.ancestorDeathLabelValue.hidden = false
+                                                self?.ancestorDeathLabelValue.isHidden = false
                                             }
                                         })
                                     }
                                 })
     }
     
-    func getAncestorDetailsData(personUrlString:String?,
+    func getAncestorDetailsData(_ personUrlString:String?,
                                 accessToken:String,
-                                completionAncestorDetails:(responseDetails: PersonDetails?, reponseError:NSError?) -> ())
+                                completionAncestorDetails:@escaping (_ responseDetails: PersonDetails?, _ reponseError:NSError?) -> ())
     {
         
-        guard let personUrlString = personUrlString, ancestorDetailsUrl = NSURL(string: personUrlString) else {
+        guard let personUrlString = personUrlString, let ancestorDetailsUrl = URL(string: personUrlString) else {
             return
         }
 
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration();
-        let headers: [NSObject : AnyObject] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
-        configuration.HTTPAdditionalHeaders = headers;
-        let session = NSURLSession(configuration: configuration)
-        let ancestorDetailDataTask = session.dataTaskWithURL(ancestorDetailsUrl) { (ancestorData, ancestorResponse, ancestorError) in
+        let configuration = URLSessionConfiguration.default;
+        let headers: [AnyHashable: Any] = ["Accept":"application/json", "Authorization":"Bearer " + accessToken];
+        configuration.httpAdditionalHeaders = headers;
+        let session = URLSession(configuration: configuration)
+        let ancestorDetailDataTask = session.dataTask(with: ancestorDetailsUrl, completionHandler: { (ancestorData, ancestorResponse, ancestorError) in
             if (ancestorError == nil)
             {
                 do
                 {
-                    let ancestryDataJson = try NSJSONSerialization.JSONObjectWithData(ancestorData!, options: .AllowFragments);
+                    let ancestryDataJson = try JSONSerialization.jsonObject(with: ancestorData!, options: .allowFragments);
                     // print("ancestryDataJson = \(ancestryDataJson)")
 
                     let persons = ancestryDataJson["persons"] as? [[String:AnyObject]]
@@ -109,14 +109,14 @@ class AncestorDetails : UIViewController
                     personDetails.personBirthDate = birthDate
                     personDetails.personDeathDate = deathDate
                     
-                    completionAncestorDetails(responseDetails: personDetails, reponseError: nil)
+                    completionAncestorDetails(personDetails, nil)
                 }
                 catch
                 {
-                    completionAncestorDetails(responseDetails: nil, reponseError: ancestorError)
+                    completionAncestorDetails(nil, ancestorError as NSError?)
                 }
             }
-        }
+        }) 
         
         ancestorDetailDataTask.resume()
     }
