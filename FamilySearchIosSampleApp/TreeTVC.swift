@@ -19,7 +19,7 @@ class TreeTVC: UITableViewController {
     
     var accessToken : String?
     
-    let cache = NSCache()
+    let cache = NSCache<NSString, UIImage>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,7 +51,7 @@ class TreeTVC: UITableViewController {
                                     if (errorTree == nil)
                                     {
                                         // set the received array, update table
-                                        self?.personArray = (responsePersons! as NSArray as? [Person])!
+                                        self?.personArray = (responsePersons! as NSArray as? [Person])! as NSArray
                                         DispatchQueue.main.async(execute: {
                                             
                                             // remove loading spinner view from tvc
@@ -78,7 +78,9 @@ class TreeTVC: UITableViewController {
         let familyTreeTask = session.dataTask(with: URL(string:familyTreeUrlAsString)!, completionHandler: { (familyTreeData, response, familyTreeError) in
             do
             {
-                let familyTreeJson = try JSONSerialization.jsonObject(with: familyTreeData!, options: .allowFragments);
+                guard let familyTreeJson = try JSONSerialization.jsonObject(with: familyTreeData!, options: .allowFragments) as? [String: AnyObject] else {
+                    return
+                }
                 //print("familyTreeJson = \(familyTreeJson)")
                 
                 // from here, we only care about the value of collections.links.ancestry-query.template, where collections is a json array
@@ -92,7 +94,7 @@ class TreeTVC: UITableViewController {
                     // need to split the template URL, and get the left side of the { symbol
                     let templateSplit = entireTemplate.components(separatedBy: "{")
                     let template = templateSplit[0]
-                    completionQuery(responseTemplate:template, errorQuery:nil)
+                    completionQuery(template, nil)
                 }
 
             }
@@ -125,7 +127,9 @@ class TreeTVC: UITableViewController {
             {
                 do
                 {
-                    let ancestryDataJson = try JSONSerialization.jsonObject(with: ancestryData!, options: .allowFragments);
+                    guard let ancestryDataJson = try JSONSerialization.jsonObject(with: ancestryData!, options: .allowFragments) as? [String: AnyObject] else {
+                        return
+                    }
                     //print("ancestryDataJson = \(ancestryDataJson)")
                     
                     let persons = ancestryDataJson["persons"] as? [[String : AnyObject]]
@@ -192,7 +196,7 @@ class TreeTVC: UITableViewController {
         {
             // the code below is to create an image cache
             var ancestorImage = UIImage()
-            if let cachedImage = cache.object(forKey: imageLink) as? UIImage
+            if let cachedImage = cache.object(forKey: imageLink as NSString)
             {
                 // image exists in cache, so use the cached image
                 ancestorImage = cachedImage
@@ -204,7 +208,7 @@ class TreeTVC: UITableViewController {
                 Utilities.getImageFromUrl(imageLink, accessToken: accessToken!) { (data, response, error)  in
                     DispatchQueue.main.async { () -> Void in
                         ancestorImage = UIImage(data: data!)!
-                        self.cache.setObject(ancestorImage, forKey: imageLink)
+                        self.cache.setObject(ancestorImage, forKey: imageLink as NSString)
                         cell.ancestorPicture.image = ancestorImage
                     }
                 }

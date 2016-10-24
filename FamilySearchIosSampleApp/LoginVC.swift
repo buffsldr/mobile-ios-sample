@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import SafariServices
+// com.vaderapps.familysearch
 
 class LoginVC: UIViewController {
     
@@ -16,9 +18,10 @@ class LoginVC: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var dataUsageLabel: UILabel!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-		
+        
         unlockScreen()
         
         usernameTextField.placeholder = NSLocalizedString("usernamePlaceholderText", comment: "username, in email form")
@@ -26,16 +29,26 @@ class LoginVC: UIViewController {
         loginButtonOutlet.setTitle(NSLocalizedString("loginText", comment: "text for login button"), for: UIControlState())
         dataUsageLabel.text = NSLocalizedString("loginDataUsage", comment: "description of data usage")
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
+    @IBAction func openURL(_ sender: UIButton) {
+        
+        let familySearchLoginURLString = "https://sandbox.familysearch.org/cis-web/oauth2/v3/authorization?response_type=code&source=oauth&client_id=" + apiKey + "&redirect_uri=" + redirectURI
+        guard let familySearchLoginURL = URL(string: familySearchLoginURLString) else { return }
+        
+        let safariVC = SFSafariViewController(url: familySearchLoginURL)
+        safariVC.delegate = self
+        present(safariVC, animated: true, completion: nil)
+    }
+    
     @IBAction func loginAction(_ sender: AnyObject)
     {
         lockScreen()
-
+        
         guard let
             username = usernameTextField.text,
             let password = passwordTextField.text
@@ -45,7 +58,7 @@ class LoginVC: UIViewController {
                 unlockScreen()
                 return
         }
-
+        
         // get initial GET call to collections
         Utilities.getUrlsFromCollections({ [weak self] (collectionsResponse, error) -> Void in
             
@@ -54,98 +67,119 @@ class LoginVC: UIViewController {
                 self?.activityIndicator.stopAnimating()
                 return
             }
-
+            
             // get the login token
-            self?.getToken(collectionsResponse.tokenUrlString!,
-                username: username,
-                password: password,
-                client_id: AppKeys.API_KEY,
-                completionToken: {(responseToken, errorToken) -> Void in
-                    guard errorToken == nil else {
-                        dispatch_async(dispatch_get_main_queue(),{
-                            self!.showAlert("Error", description: errorToken!.localizedDescription)
-                            self!.unlockScreen()
-                        })
-
-                        return
-                    }
-
-                    // get user data, with the newly acquired token
-                    self?.getCurrentUserData(collectionsResponse.currentUserString!,
-                        accessToken: responseToken!,
-                        completionCurrentUser:{(responseUser, errorUser) -> Void in
-                            guard errorToken == nil else {
-                                dispatch_async(dispatch_get_main_queue(),{
-                                    self!.showAlert("Error", description: errorToken!.localizedDescription)
-                                    self!.unlockScreen()
+            if #available(iOS 10.0, *) {
+                self?.getToken(collectionsResponse.tokenUrlString!,
+                               username: username,
+                               password: password,
+                               client_id: AppKeys.API_KEY,
+                               completionToken: {(responseToken, errorToken) -> Void in
+                                guard errorToken == nil else {
+                                    DispatchQueue.main.async(execute: {
+                                        self!.showAlert("Error", description: errorToken!.localizedDescription)
+                                        self!.unlockScreen()
+                                    })
+                                    
+                                    return
+                                }
+                                
+                                // get user data, with the newly acquired token
+                                self?.getCurrentUserData(collectionsResponse.currentUserString!,
+                                                         accessToken: responseToken!,
+                                                         completionCurrentUser:{(responseUser, errorUser) -> Void in
+                                                            guard errorToken == nil else {
+                                                                DispatchQueue.main.async(execute: {
+                                                                    self!.showAlert("Error", description: errorToken!.localizedDescription)
+                                                                    self!.unlockScreen()
+                                                                })
+                                                                return
+                                                            }
+                                                            // all login data needed has been downloaded
+                                                            // push to the next view controller, in the main thread
+                                                            DispatchQueue.main.async(execute: {
+                                                                [weak self] in
+                                                                self?.performSegue(withIdentifier: "segueToTabBar", sender: responseUser)
+                                                                })
                                 })
-                                return
-                            }
-                            // all login data needed has been downloaded
-                            // push to the next view controller, in the main thread
-                            dispatch_async(dispatch_get_main_queue(),{
-                                [weak self] in
-                                self?.performSegueWithIdentifier("segueToTabBar", sender: responseUser)
-                            })
-                            
-                    })
-                    
-                }
-            )
-        })
+                                
+                    }
+                )
+            } else {
+                // Fallback on earlier versions
+            }
+            })
     }
     
+    @available(iOS 10.0, *)
     func getToken(_ tokenUrlAsString : String, username : String, password : String, client_id : String, completionToken:@escaping (_ responseToken:String?, _ errorToken:NSError?) -> ()) {
         let grant_type = "password";
         
-        let params = "?username=" + username +
-            "&password=" + password +
-            "&grant_type=" + grant_type +
-            "&client_id=" + AppKeys.API_KEY;
         
-        let urlAsString = tokenUrlAsString + params
+        let familySearchLoginURLString = "https://sandbox.familysearch.org/cis-web/oauth2/v3/authorization?response_type=code&source=oauth&client_id=" + apiKey + "&redirect_uri=" + redirectURI
+        guard let familySearchLoginURL = URL(string: familySearchLoginURLString) else { return }
+        UIApplication.shared.open(familySearchLoginURL, options: [:]) { success in
+            
+            
+            print(success)
+            
+            
+            
+            
+            print("Here is anser \(success)")
+            
+            
+            let a = 123
+            
+            
+            
+            let g = 1234
+        }  //openURL(familySearchLoginURL)
+        //
+        //        // create the post request
+        //        let request = NSMutableURLRequest(url: URL(string: familySearchLoginURLString)!)
+        //
+        //        request.httpMethod = "POST"
+        //
+        //        let task = URLSession.shared.dataTask(with: request as URLRequest){ data, response, error in
+        //            print("Data is \(data)")
+        //
+        //            guard error == nil else {
+        //                print("Error downloading token. Error: \(error)")
+        //                completionToken(nil, error as NSError?)
+        //                return
+        //            }
+        //            do  {
+        //                guard let jsonToken = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String: AnyObject] else {
+        //                    return
+        //                }
+        //
+        //                if let error = jsonToken["error"] as? String
+        //                {
+        //                    let description = jsonToken["error_description"] as? String
+        //                    print("\(error) \(description)")
+        //
+        //                    let userInfo = [NSLocalizedDescriptionKey : description!]
+        //                    completionToken(nil, NSError(domain: "FamilySearch", code: 1, userInfo: userInfo))
+        //                }
+        //
+        //                if let token = jsonToken["access_token"] as? String
+        //                {
+        //                    // parse the json to get the access_token, and save this token in NSUserDefaults
+        //                    let preferences = UserDefaults.standard
+        //                    preferences.setValue(token, forKey: Utilities.KEY_ACCESS_TOKEN)
+        //                    preferences.synchronize()
+        //
+        //                    completionToken(token, nil)
+        //                }
+        //            }
+        //            catch {
+        //                print("Error: \(error)");
+        //            }
         
-        // create the post request
-        let request = NSMutableURLRequest(URL: URL(string: urlAsString)!)
-        request.HTTPMethod = "POST"
+        //  }
         
-        let task = URLSession.sharedSession().dataTaskWithRequest(request){ data, response, error in
-            guard error == nil else {
-                print("Error downloading token. Error: \(error)")
-                completionToken(responseToken: nil, errorToken: error)
-                return
-            }
-            do
-            {
-                let jsonToken = try NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments);
-                
-                if let error = jsonToken["error"] as? String
-                {
-                    let description = jsonToken["error_description"] as? String
-                    print("\(error) \(description)")
-                    
-                    let userInfo = [NSLocalizedDescriptionKey : description!]
-                    completionToken(responseToken: nil, errorToken: NSError(domain: "FamilySearch", code: 1, userInfo: userInfo))
-                }
-                
-                if let token = jsonToken["access_token"] as? String
-                {
-                    // parse the json to get the access_token, and save this token in NSUserDefaults
-                    let preferences = NSUserDefaults.standardUserDefaults()
-                    preferences.setValue(token, forKey: Utilities.KEY_ACCESS_TOKEN)
-                    preferences.synchronize()
-                
-                    completionToken(responseToken: token, errorToken: nil)
-                }
-            }
-            catch
-            {
-                print("Error parsing token JSON. Error: \(error)");
-            }
-                
-        }
-        
-        task.resume()
+        // task.resume()
     }
     
     // get the user data
@@ -162,7 +196,9 @@ class LoginVC: UIViewController {
             // parse the currentUser data
             do
             {
-                let currentUserJson = try JSONSerialization.jsonObject(with: data!, options: .allowFragments);
+                guard let currentUserJson = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String: AnyObject] else {
+                    return
+                }
                 
                 if let usersJsonObject = currentUserJson["users"] as? [[String : AnyObject]]
                 {
@@ -203,18 +239,18 @@ class LoginVC: UIViewController {
                     
                     completionCurrentUser(nil, nil)
                 }
-
+                
             }
             catch
             {
                 completionCurrentUser(nil, errorUserData as NSError?)
             }
-        }) 
+        })
         currentUserTask.resume()
         
     }
     
-// MARK: - Segue methods
+    // MARK: - Segue methods
     override func prepare(for segue: UIStoryboardSegue, sender: Any?)
     {
         if (segue.identifier == "segueToTabBar")
@@ -237,25 +273,31 @@ class LoginVC: UIViewController {
             self.activityIndicator.stopAnimating()
         }
     }
-	
-// MARK: - Private methods
-	fileprivate func lockScreen() {
-		usernameTextField.isEnabled = false
-		passwordTextField.isEnabled = false
-		activityIndicator.startAnimating()
-	}
-	
-	fileprivate func unlockScreen() {
-		usernameTextField.isEnabled = true
-		passwordTextField.isEnabled = true
-		activityIndicator.stopAnimating()
-	}
+    
+    // MARK: - Private methods
+    fileprivate func lockScreen() {
+        usernameTextField.isEnabled = false
+        passwordTextField.isEnabled = false
+        activityIndicator.startAnimating()
+    }
+    
+    fileprivate func unlockScreen() {
+        usernameTextField.isEnabled = true
+        passwordTextField.isEnabled = true
+        activityIndicator.stopAnimating()
+    }
 }
 
 
 
 
-
+extension LoginVC: SFSafariViewControllerDelegate {
+    
+    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+    
+}
 
 
 

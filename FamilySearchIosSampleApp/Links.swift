@@ -8,15 +8,10 @@
 
 import Foundation
 
-class Links : NSObject
-{
+class Links : NSObject {
+    
     var tokenUrlString : String?
-    
     var currentUserString : String?
-    
     var familyTreeUrlString : String?
     
-    override init() {
-        // empty initializer
-    }
 }

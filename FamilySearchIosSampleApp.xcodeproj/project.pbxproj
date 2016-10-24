@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D07D1BF1DBBCA2900DD1D39 /* HashProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D07D1BD1DBBCA2900DD1D39 /* HashProvider.swift */; };
+		4D07D1C01DBBCA2900DD1D39 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D07D1BE1DBBCA2900DD1D39 /* AuthenticationManager.swift */; };
+		4D07D1C31DBBCA5300DD1D39 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D07D1C21DBBCA5300DD1D39 /* Token.swift */; };
+		4DA702531DAB84D300D920AA /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA702521DAB84D300D920AA /* AuthViewController.swift */; };
+		4DD2447C1DBC1EB900D78FBE /* RequestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD2447B1DBC1EB900D78FBE /* RequestData.swift */; };
 		4DD347D71DA9A5100021FB6C /* AppKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD347D61DA9A5100021FB6C /* AppKeys.swift */; };
 		5E7D1C301D4BFD5E00874503 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7D1C2E1D4BFB7D00874503 /* Extensions.swift */; };
 		A00150AF1D08FF76008E53E8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00150AE1D08FF76008E53E8 /* User.swift */; };
@@ -26,9 +31,16 @@
 		A043B8BC1D0B489100548718 /* AncestorDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = A043B8BB1D0B489100548718 /* AncestorDetails.swift */; };
 		A05168E41D09EDDA005E7EE9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A05168E31D09EDDA005E7EE9 /* Localizable.strings */; };
 		A0D6047F1D03D99A00F2A83D /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D6047E1D03D99A00F2A83D /* Utilities.swift */; };
+		A1FAED0E4DB28AF1A46A8FA4 /* Pods_FamilySearchIosSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FEE9B1B9DC90BE5366EC744 /* Pods_FamilySearchIosSampleApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1FEE9B1B9DC90BE5366EC744 /* Pods_FamilySearchIosSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FamilySearchIosSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D07D1BD1DBBCA2900DD1D39 /* HashProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashProvider.swift; sourceTree = "<group>"; };
+		4D07D1BE1DBBCA2900DD1D39 /* AuthenticationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
+		4D07D1C21DBBCA5300DD1D39 /* Token.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
+		4DA702521DAB84D300D920AA /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
+		4DD2447B1DBC1EB900D78FBE /* RequestData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestData.swift; sourceTree = "<group>"; };
 		4DD347D61DA9A5100021FB6C /* AppKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKeys.swift; sourceTree = "<group>"; };
 		5E7D1C2E1D4BFB7D00874503 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		A00150AE1D08FF76008E53E8 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -51,6 +63,8 @@
 		A043B8BB1D0B489100548718 /* AncestorDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AncestorDetails.swift; sourceTree = "<group>"; };
 		A05168E31D09EDDA005E7EE9 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		A0D6047E1D03D99A00F2A83D /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		AA0DEFD21D0BF70A75061C10 /* Pods-FamilySearchIosSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FamilySearchIosSampleApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-FamilySearchIosSampleApp/Pods-FamilySearchIosSampleApp.release.xcconfig"; sourceTree = "<group>"; };
+		FEA5C6E9ED470C2875823022 /* Pods-FamilySearchIosSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FamilySearchIosSampleApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FamilySearchIosSampleApp/Pods-FamilySearchIosSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,12 +72,32 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1FAED0E4DB28AF1A46A8FA4 /* Pods_FamilySearchIosSampleApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D07D1C11DBBCA2E00DD1D39 /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				4D07D1C21DBBCA5300DD1D39 /* Token.swift */,
+				4DD2447B1DBC1EB900D78FBE /* RequestData.swift */,
+				4D07D1BD1DBBCA2900DD1D39 /* HashProvider.swift */,
+				4D07D1BE1DBBCA2900DD1D39 /* AuthenticationManager.swift */,
+			);
+			name = Authentication;
+			sourceTree = "<group>";
+		};
+		4DD64AE6E4B4B5247B93EBB4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1FEE9B1B9DC90BE5366EC744 /* Pods_FamilySearchIosSampleApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A00BB4AE1D0673DD009ADBDB /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -81,6 +115,8 @@
 			children = (
 				A01D9FD01D023344005473BD /* FamilySearchIosSampleApp */,
 				A01D9FCF1D023344005473BD /* Products */,
+				BCDCA6AE9D5467BB3E43CBCD /* Pods */,
+				4DD64AE6E4B4B5247B93EBB4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,6 +131,7 @@
 		A01D9FD01D023344005473BD /* FamilySearchIosSampleApp */ = {
 			isa = PBXGroup;
 			children = (
+				4D07D1C11DBBCA2E00DD1D39 /* Authentication */,
 				A01D9FD11D023344005473BD /* AppDelegate.swift */,
 				4DD347D61DA9A5100021FB6C /* AppKeys.swift */,
 				A0D6047D1D03D98200F2A83D /* Utils */,
@@ -136,8 +173,18 @@
 			children = (
 				A0D6047E1D03D99A00F2A83D /* Utilities.swift */,
 				A03BAE501D106A91002572BA /* WaitingView.swift */,
+				4DA702521DAB84D300D920AA /* AuthViewController.swift */,
 			);
 			name = Utils;
+			sourceTree = "<group>";
+		};
+		BCDCA6AE9D5467BB3E43CBCD /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FEA5C6E9ED470C2875823022 /* Pods-FamilySearchIosSampleApp.debug.xcconfig */,
+				AA0DEFD21D0BF70A75061C10 /* Pods-FamilySearchIosSampleApp.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -147,9 +194,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A01D9FE01D023344005473BD /* Build configuration list for PBXNativeTarget "FamilySearchIosSampleApp" */;
 			buildPhases = (
+				59C560EFE6E5DD337B6D1017 /* [CP] Check Pods Manifest.lock */,
 				A01D9FCA1D023344005473BD /* Sources */,
 				A01D9FCB1D023344005473BD /* Frameworks */,
 				A01D9FCC1D023344005473BD /* Resources */,
+				2BA879901EC85EA30B7FD6E9 /* [CP] Embed Pods Frameworks */,
+				6F09503F4167465A3DBC3008 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -172,6 +222,7 @@
 				TargetAttributes = {
 					A01D9FCD1D023344005473BD = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = 7Y4CU665ST;
 						LastSwiftMigration = 0800;
 					};
 				};
@@ -208,6 +259,54 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2BA879901EC85EA30B7FD6E9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FamilySearchIosSampleApp/Pods-FamilySearchIosSampleApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		59C560EFE6E5DD337B6D1017 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		6F09503F4167465A3DBC3008 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FamilySearchIosSampleApp/Pods-FamilySearchIosSampleApp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A01D9FCA1D023344005473BD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -216,16 +315,21 @@
 				A01D9FD41D023344005473BD /* LoginVC.swift in Sources */,
 				A01B4FBC1D0CFB3600E90D6D /* MemoriesVC.swift in Sources */,
 				A0151B321D10FBA6008DADD8 /* MemoryCell.swift in Sources */,
+				4D07D1C01DBBCA2900DD1D39 /* AuthenticationManager.swift in Sources */,
 				4DD347D71DA9A5100021FB6C /* AppKeys.swift in Sources */,
+				4DA702531DAB84D300D920AA /* AuthViewController.swift in Sources */,
 				A00FDD3D1D02755700C7384B /* Links.swift in Sources */,
 				A0D6047F1D03D99A00F2A83D /* Utilities.swift in Sources */,
 				A0296F111D0A688A00FAE4E0 /* PersonCell.swift in Sources */,
 				A00BB4B01D06741E009ADBDB /* TreeTVC.swift in Sources */,
 				A01D9FD21D023344005473BD /* AppDelegate.swift in Sources */,
+				4DD2447C1DBC1EB900D78FBE /* RequestData.swift in Sources */,
 				A03BAE511D106A91002572BA /* WaitingView.swift in Sources */,
 				5E7D1C301D4BFD5E00874503 /* Extensions.swift in Sources */,
 				A025A93F1D0BCB180058B22A /* PersonDetails.swift in Sources */,
 				A043B8BC1D0B489100548718 /* AncestorDetails.swift in Sources */,
+				4D07D1C31DBBCA5300DD1D39 /* Token.swift in Sources */,
+				4D07D1BF1DBBCA2900DD1D39 /* HashProvider.swift in Sources */,
 				A0296F0E1D0A60B000FAE4E0 /* Person.swift in Sources */,
 				A00150AF1D08FF76008E53E8 /* User.swift in Sources */,
 			);
@@ -340,8 +444,10 @@
 		};
 		A01D9FE11D023344005473BD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FEA5C6E9ED470C2875823022 /* Pods-FamilySearchIosSampleApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 7Y4CU665ST;
 				INFOPLIST_FILE = FamilySearchIosSampleApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -353,8 +459,10 @@
 		};
 		A01D9FE21D023344005473BD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA0DEFD21D0BF70A75061C10 /* Pods-FamilySearchIosSampleApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 7Y4CU665ST;
 				INFOPLIST_FILE = FamilySearchIosSampleApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

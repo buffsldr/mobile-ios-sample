@@ -9,8 +9,8 @@
 import Foundation
 import UIKit
 
-class MemoriesVC : UICollectionViewController
-{
+class MemoriesVC : UICollectionViewController {
+
     var user : User?
     
     let arrayOfImageThumbnailHrefs = NSMutableArray()
@@ -27,7 +27,7 @@ class MemoriesVC : UICollectionViewController
         accessToken = preferences.string(forKey: Utilities.KEY_ACCESS_TOKEN)
         
         // get an array of the links of images
-        getMemoriesLinksForUser(accessToken!,
+        getMemoriesLinksForUser(accessToken: accessToken!,
                                  completionLinks: {(completionLinks, errorLinks) -> Void in
                                     if (errorLinks == nil)
                                     {
@@ -43,7 +43,7 @@ class MemoriesVC : UICollectionViewController
         })
     }
     
-    func getMemoriesLinksForUser(_ accessToken:String,
+    func getMemoriesLinksForUser(accessToken:String,
                                   completionLinks:@escaping (_ responseLinks:NSMutableArray?, _ errorLinks:NSError?) -> ())
     {
         let configuration = URLSessionConfiguration.default;
@@ -56,13 +56,13 @@ class MemoriesVC : UICollectionViewController
         }
         
         let memoriesTask = session.dataTask(with: memoriesHref, completionHandler: { [weak self] (memoriesData, response, memoriesError) in
-            do
-            {
-                let memoriesDataJson = try JSONSerialization.jsonObject(with: memoriesData!, options: .allowFragments);
+            do {
+                guard let memoriesDataJson = try JSONSerialization.jsonObject(with: memoriesData!, options: .allowFragments) as? [String: AnyObject] else {
+                    return
+                }
                 
                 let sourceDescriptions = memoriesDataJson["sourceDescriptions"] as? [NSDictionary]
-                for sourceDescription in sourceDescriptions!
-                {
+                for sourceDescription in sourceDescriptions! {
                     // for this demo we're only downloading images, so we need to check if the sourceDescription contains an image
                     let mediaType = sourceDescription["mediaType"] as? String
                     if (mediaType == "image/jpeg")
@@ -83,7 +83,7 @@ class MemoriesVC : UICollectionViewController
             {
                 completionLinks(nil, memoriesError as NSError?)
             }
-        }) 
+        })
         memoriesTask.resume()
     }
     
@@ -126,43 +126,3 @@ class MemoriesVC : UICollectionViewController
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-API_KEY

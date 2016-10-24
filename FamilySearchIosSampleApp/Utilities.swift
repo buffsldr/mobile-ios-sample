@@ -9,83 +9,79 @@
 import Foundation
 import UIKit
 
+typealias Payload = [String: AnyObject]
+
+let endpointURLKey = "http://oauth.net/core/2.0/endpoint/token"
+let currentUserKey = "current-user"
+let familyTreeKey = "family-tree"
+let hrefKey = "href"
+
 class Utilities: NSObject {
     
     static let KEY_ACCESS_TOKEN = "access_token";
     
-    static func getUrlsFromCollections(_ completionHandler:@escaping (_ response:Links, _ error:NSError?) -> ())
-    {
+    static func getUrlsFromCollections(_ completionHandler:@escaping (_ response:Links, _ error:NSError?) -> ()) {
         let collectionUrlString = "https://familysearch.org/platform/collection"
         
         let linksObject = Links()
-        
-        let collectionUrl = URL(string: collectionUrlString);
+        // This is a link to the JSON structure the church uses
+        guard let collectionUrl = URL(string: collectionUrlString) else {
+            return
+        }
         
         let configuration = URLSessionConfiguration.default;
         let headers: [AnyHashable: Any] = ["Accept":"application/json"];
         configuration.httpAdditionalHeaders = headers;
         let session = URLSession(configuration: configuration)
         
-        
-        let configurationUrlTask = session.dataTask(with: collectionUrl!, completionHandler: {(data, response, error) in
+        let configurationUrlTask = session.dataTask(with: collectionUrl, completionHandler: {(data, response, error) in
             
             // parse the list of possible configuration urls, go just get the
-            do
-            {
-                let jsonCollections = try JSONSerialization.jsonObject(with: data!, options: .allowFragments);
-                if let collectionsJsonObject = jsonCollections["collections"] as? [[String : AnyObject]]
-                {
-                    for collection in collectionsJsonObject
-                    {
-                        if let links = collection["links"] as? [String : AnyObject]
-                        {
-                            // uncomment the line below to see the list of links available
-                            //print("links = \(links)");
-                            
-                            // get the url to get the token
-                            if let tokenUrlObject = links["http://oauth.net/core/2.0/endpoint/token"] as? [String : AnyObject]
-                            {
-                                if let tokenUrlString = tokenUrlObject["href"] as? String
-                                {
-                                    linksObject.tokenUrlString = tokenUrlString
-                                }
+            do {
+                guard let data = data, let jsonCollectionsFound = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Payload, let collectionsJsonObject = jsonCollectionsFound["collections"] as? [[String : AnyObject]]  else {
+                        return
+                }
+                
+                for collection in collectionsJsonObject {
+                    if let links = collection["links"] as? [String: AnyObject] {
+                        // uncomment the line below to see the list of links available
+                        //print("links = \(links)");
+                        
+                        // get the url to get the token
+                        if let tokenUrlObject = links[endpointURLKey] as? [String : AnyObject] {
+                            if let tokenUrlString = tokenUrlObject[hrefKey] as? String {
+                                linksObject.tokenUrlString = tokenUrlString
                             }
-                            
-                            // get the url to get the data for the current user
-                            if let currentUserUrlObject = links["current-user"] as? [String : AnyObject]
-                            {
-                                if let currentUserUrlString = currentUserUrlObject["href"] as? String
-                                {
-                                    linksObject.currentUserString = currentUserUrlString
-                                }
+                        }
+                        
+                        // get the url to get the data for the current user
+                        if let currentUserUrlObject = links[currentUserKey] as? [String : AnyObject] {
+                            if let currentUserUrlString = currentUserUrlObject[hrefKey] as? String {
+                                linksObject.currentUserString = currentUserUrlString
                             }
-                            
-                            // get the url to get the data for the family tree
-                            if let familyTreeUrlObject = links["family-tree"] as? [String : AnyObject]
-                            {
-                                if let familyTreeUrlString = familyTreeUrlObject["href"] as? String
-                                {
-                                    linksObject.familyTreeUrlString = familyTreeUrlString
-                                }
+                        }
+                        
+                        // get the url to get the data for the family tree
+                        if let familyTreeUrlObject = links[familyTreeKey] as? [String : AnyObject] {
+                            if let familyTreeUrlString = familyTreeUrlObject[hrefKey] as? String {
+                                linksObject.familyTreeUrlString = familyTreeUrlString
                             }
                         }
                     }
                 }
             }
-            catch
-            {
+            catch {
                 print("Error parsing collections JSON. Error: \(error)");
             }
             
             completionHandler(linksObject, error as NSError?)
-        }) 
+        })
         
         configurationUrlTask.resume()
     }
     
     // helper function to download images
-    static func getImageFromUrl(_ urlAsString:String, accessToken:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: NSError? ) -> Void))
-    {
+    static func getImageFromUrl(_ urlAsString:String, accessToken:String, completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: NSError? ) -> Void)) {
         // this is the url of the default image
         // notice that this url is HTTP, which means that the app has to allow arbitraty loads for non-HTTPS calls.
         // This can be found under Target > Info > App Transport Security Settings
@@ -94,9 +90,18 @@ class Utilities: NSObject {
         var imageUrlString = urlAsString + "/portrait"
         imageUrlString = imageUrlString + "?access_token=" + accessToken;
         imageUrlString = imageUrlString + "&default=" + defaultImageUrl;
-        URLSession.shared.dataTask(with: URL(string: imageUrlString)!, completionHandler: { (data, response, error) in
-            completion(data, response, error)
-            }) .resume()
+        guard let imageURL = URL(string: imageUrlString) else {
+            return
+        }
+        URLSession.shared.dataTask(with: imageURL) { (data, response, error) in
+            
+            
+        }.resume()
+        
+//        dataTask(with: imageURL) { (data, response, error) in
+//            completion(data, response, error)
+//        }
+        
     }
     
     // helper function to display an activity indicator

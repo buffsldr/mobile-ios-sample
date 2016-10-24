@@ -94,7 +94,9 @@ class AncestorDetails : UIViewController
             {
                 do
                 {
-                    let ancestryDataJson = try JSONSerialization.jsonObject(with: ancestorData!, options: .allowFragments);
+                    guard let ancestryDataJson = try JSONSerialization.jsonObject(with: ancestorData!, options: .allowFragments) as? [String: AnyObject] else {
+                        return 
+                    }
                     // print("ancestryDataJson = \(ancestryDataJson)")
 
                     let persons = ancestryDataJson["persons"] as? [[String:AnyObject]]

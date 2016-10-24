@@ -7,13 +7,23 @@
 //
 
 import UIKit
-
+//com.vaderapps.familysearch
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
+    func application(application: UIApplication,
+                     openURL url: NSURL,
+                     sourceApplication: String?,
+                     annotation: AnyObject?) -> Bool {
+        let notification = NSNotification(name: NSNotification.Name(rawValue: "OpenVaderApps"),
+                                          object:nil,
+                                          userInfo:[UIApplicationLaunchOptionsKey.url:url])
+        NotificationCenter.default.post(notification as Notification)
+        return true
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         return true
