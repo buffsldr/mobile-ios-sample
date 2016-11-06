@@ -21,7 +21,7 @@ class Utilities: NSObject {
     static let KEY_ACCESS_TOKEN = "access_token";
     
     static func getUrlsFromCollections(_ completionHandler:@escaping (_ response:Links, _ error:NSError?) -> ()) {
-        let collectionUrlString = "https://familysearch.org/platform/collection"
+        let collectionUrlString = "https://sandbox.familysearch.org/platform/collection"
         
         let linksObject = Links()
         // This is a link to the JSON structure the church uses

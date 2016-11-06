@@ -120,7 +120,7 @@ class AuthenticationManager: NSObject, WKNavigationDelegate, TokenProvider {
     }
     
     func registerForNotifications() {
-        NotificationCenter.default.addObserver(self, selector: "handleCodeReceivedNotification:", name: NSNotification.Name(rawValue: codeReceivedNotification), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AuthenticationManager.handleCodeReceivedNotification(notification:)), name: NSNotification.Name(rawValue: codeReceivedNotification), object: nil)
     }
 
     func handleCodeReceivedNotification(notification: NSNotification) {

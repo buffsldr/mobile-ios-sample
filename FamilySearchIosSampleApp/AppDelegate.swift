@@ -13,14 +13,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(application: UIApplication,
-                     openURL url: NSURL,
-                     sourceApplication: String?,
-                     annotation: AnyObject?) -> Bool {
-        let notification = NSNotification(name: NSNotification.Name(rawValue: "OpenVaderApps"),
-                                          object:nil,
-                                          userInfo:[UIApplicationLaunchOptionsKey.url:url])
-        NotificationCenter.default.post(notification as Notification)
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        guard let query = urlComponents?.query else {
+            return false
+        }
+        let dictionary: [AnyHashable: Any] = ["code": query]
+        NotificationCenter.default.post(name: Notification.Name(rawValue: codeReceivedNotification), object: nil, userInfo: dictionary)
+        
         return true
     }
     
