@@ -36,15 +36,7 @@ class LoginVC: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func openURL(_ sender: UIButton) {
-        
-        let familySearchLoginURLString = "https://sandbox.familysearch.org/cis-web/oauth2/v3/authorization?response_type=code&source=oauth&client_id=" + apiKey + "&redirect_uri=" + redirectURI
-        guard let familySearchLoginURL = URL(string: familySearchLoginURLString) else { return }
-        
-        let safariVC = SFSafariViewController(url: familySearchLoginURL)
-        safariVC.delegate = self
-        present(safariVC, animated: true, completion: nil)
-    }
+
     
     @IBAction func loginAction(_ sender: AnyObject)
     {
@@ -117,7 +109,7 @@ class LoginVC: UIViewController {
         let grant_type = "password";
         
         
-        let familySearchLoginURLString = "https://sandbox.familysearch.org/cis-web/oauth2/v3/authorization?response_type=code&source=oauth&client_id=" + apiKey + "&redirect_uri=" + redirectURI
+        let familySearchLoginURLString = tokenUrlAsString
         guard let familySearchLoginURL = URL(string: familySearchLoginURLString) else { return }
         UIApplication.shared.open(familySearchLoginURL, options: [:]) { success in
             
@@ -135,53 +127,9 @@ class LoginVC: UIViewController {
             
             
             let g = 1234
-        }  //openURL(familySearchLoginURL)
-        //
-        //        // create the post request
-        //        let request = NSMutableURLRequest(url: URL(string: familySearchLoginURLString)!)
-        //
-        //        request.httpMethod = "POST"
-        //
-        //        let task = URLSession.shared.dataTask(with: request as URLRequest){ data, response, error in
-        //            print("Data is \(data)")
-        //
-        //            guard error == nil else {
-        //                print("Error downloading token. Error: \(error)")
-        //                completionToken(nil, error as NSError?)
-        //                return
-        //            }
-        //            do  {
-        //                guard let jsonToken = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String: AnyObject] else {
-        //                    return
-        //                }
-        //
-        //                if let error = jsonToken["error"] as? String
-        //                {
-        //                    let description = jsonToken["error_description"] as? String
-        //                    print("\(error) \(description)")
-        //
-        //                    let userInfo = [NSLocalizedDescriptionKey : description!]
-        //                    completionToken(nil, NSError(domain: "FamilySearch", code: 1, userInfo: userInfo))
-        //                }
-        //
-        //                if let token = jsonToken["access_token"] as? String
-        //                {
-        //                    // parse the json to get the access_token, and save this token in NSUserDefaults
-        //                    let preferences = UserDefaults.standard
-        //                    preferences.setValue(token, forKey: Utilities.KEY_ACCESS_TOKEN)
-        //                    preferences.synchronize()
-        //
-        //                    completionToken(token, nil)
-        //                }
-        //            }
-        //            catch {
-        //                print("Error: \(error)");
-        //            }
+        }
         
-        //  }
-        
-        // task.resume()
-    }
+            }
     
     // get the user data
     func getCurrentUserData(_ currentUserUrlString : String, accessToken : String, completionCurrentUser:@escaping (_ responseUser:User?, _ errorUser:NSError?) -> ())
